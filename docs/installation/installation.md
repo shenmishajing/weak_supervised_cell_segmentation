@@ -21,12 +21,26 @@ conda install ninja
 Use pip install detectron2 from github directly. Just use the follow command to build detectron2 from source on github:
 
 ```bash
-TORCH_CUDA_ARCH_LIST="<cuda archs to support>" pip install 'git+https://github.com/facebookresearch/detectron2.git[@<branch/tag name or commit id>]'
+pip install 'git+https://github.com/facebookresearch/detectron2.git'
 ```
 
-If you only want to support gpus on your current machine, you can omit the `TORCH_CUDA_ARCH_LIST` env var, and detectron2 will infer it automatically.
+##### CUDA_ARCH
 
-If you want to install detectron2 with the latest version, you can omit the `@<part>` after the detectron2 github url.
+By default, detectron2 will infer `CUDA_ARCH` automatically according to gpus on your current machine. But, if you are building detectron2 on no-gpu node (like build on SLURM control node) or want to support gpus not on your current machine, you will need to set the `TORCH_CUDA_ARCH_LIST` env var manually, then, use command as follow:
+
+```bash
+TORCH_CUDA_ARCH_LIST="<cuda archs to support>" pip install 'git+https://github.com/facebookresearch/detectron2.git'
+```
+
+For the `CUDA_ARCH` of gpus, check [cuda arch doc](https://developer.nvidia.com/cuda-gpus) for details.
+
+##### Specific version
+
+Sometimes, you will need to select the version of detectron2, then just add the `branch name` or `tag name` or `ref id` after the github url. Use command as follow:
+
+```bash
+pip install 'git+https://github.com/facebookresearch/detectron2.git[@<branch/tag name or commit id>]'
+```
 
 ### Automaticaly installation
 
