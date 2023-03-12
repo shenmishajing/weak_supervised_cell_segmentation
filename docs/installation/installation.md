@@ -4,7 +4,9 @@
 
 First, install some packages from their official site manually, mainly some packages related to cuda, and you have to choose the cuda version to use. 
 
-By default, you only have to install [pytorch](https://pytorch.org/get-started/locally/) from their official site manually, and you can skip this if you want to use the latest pytorch.
+#### Pytorch
+
+Install [pytorch](https://pytorch.org/get-started/locally/) from their official site manually. You can skip this if you want to use the latest pytorch.
 
 ### Automaticaly installation
 
