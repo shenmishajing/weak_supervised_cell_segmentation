@@ -14,7 +14,7 @@ conda create -n <env_name> python=3.9
 
 #### Pytorch
 
-Install `[pytorch](https://pytorch.org/get-started/locally/) <= 1.10` and `cuda<=11.3` from their official site manually. If you are using `conda`, use command as follow to install `pytorch`.
+Install [pytorch](https://pytorch.org/get-started/locally/) `<=1.10` and `cuda<=11.3` from their official site manually. If you are using `conda`, use command as follow to install `pytorch`.
 
 ```bash
 conda install pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=11.3 -c pytorch -c conda-forge
@@ -56,7 +56,7 @@ pip install 'git+https://github.com/facebookresearch/detectron2.git@9eb4831'
 
 #### AdelaiDet
 
-The `adet/data/datasets` folder of AdelaiDet has no `__init__.py` file, so it is not a python package. Therefore, if we use pip install it from github directly, we can not access it. Before they fix this, we have to clone it and install it in editable mode. Use command as follow:
+The `adet/data/datasets` folder of AdelaiDet has no `__init__.py` file, so it is not a python package. Therefore, if we use pip install it from github directly, we can not access it. Before they fix this, we have to clone it and install it in editable mode, for more details, see [code](https://github.com/aim-uofa/AdelaiDet). Use command as follow:
 
 ```bash
 git clone https://github.com/aim-uofa/AdelaiDet.git
