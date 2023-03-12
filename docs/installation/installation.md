@@ -4,9 +4,21 @@
 
 First, install some packages from their official site manually, mainly some packages related to cuda, and you have to choose the cuda version to use. 
 
+#### Python
+
+Make sure you are use `python<=3.9`, if you are using `conda`, use command as follow to create an env with `python=3.9`
+
+```bash
+conda create -n <env_name> python=3.9
+```
+
 #### Pytorch
 
-Install [pytorch](https://pytorch.org/get-started/locally/) from their official site manually.
+Install `[pytorch](https://pytorch.org/get-started/locally/) <= 1.10` and `cuda<=11.3` from their official site manually. If you are using `conda`, use command as follow to install `pytorch`.
+
+```bash
+conda install pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=11.3 -c pytorch -c conda-forge
+```
 
 #### Detectron2
 
@@ -36,10 +48,20 @@ For the `CUDA_ARCH` of gpus, check [cuda arch doc](https://developer.nvidia.com/
 
 ##### Specific version
 
-Sometimes, you will need to select the version of detectron2, then just add the `branch name` or `tag name` or `ref id` after the github url. Use command as follow:
+If you have any issues related to Detectron2, try detectron2 with commit id `9eb4831`. Use command as follow:
 
 ```bash
-pip install 'git+https://github.com/facebookresearch/detectron2.git[@<branch/tag name or commit id>]'
+pip install 'git+https://github.com/facebookresearch/detectron2.git@9eb4831'
+```
+
+#### AdelaiDet
+
+The `adet/data/datasets` folder of AdelaiDet has no `__init__.py` file, so it is not a python package. Therefore, if we use pip install it from github directly, we can not access it. Before they fix this, we have to clone it and install it in editable mode. Use command as follow:
+
+```bash
+git clone https://github.com/aim-uofa/AdelaiDet.git
+cd AdelaiDet
+pip install -e .
 ```
 
 ### Automaticaly installation

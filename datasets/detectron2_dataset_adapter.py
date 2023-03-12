@@ -6,17 +6,15 @@ os.environ["DETECTRON2_DATASETS"] = "data"
 
 import copy
 
-from detectron2.config import CfgNode, get_cfg
-from detectron2.data import MetadataCatalog
-from detectron2.data.build import (
-    _test_loader_from_config,
-    _train_loader_from_config,
-    trivial_batch_collator,
-)
+from adet.config import get_cfg
+from adet.data.dataset_mapper import DatasetMapperWithBasis
+from adet.data.fcpose_dataset_mapper import FCPoseDatasetMapper
+from adet.evaluation import TextEvaluator
+from detectron2.config import CfgNode
+from detectron2.data import DatasetMapper, MetadataCatalog
+from detectron2.data.build import get_detection_dataset_dicts, trivial_batch_collator
 from detectron2.data.common import DatasetFromList, MapDataset
 from detectron2.evaluation import (
-    CityscapesInstanceEvaluator,
-    CityscapesSemSegEvaluator,
     COCOEvaluator,
     COCOPanopticEvaluator,
     DatasetEvaluators,
@@ -45,28 +43,28 @@ def build_evaluator(cfg, dataset_name, output_folder=None):
             SemSegEvaluator(
                 dataset_name,
                 distributed=True,
+                num_classes=cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES,
+                ignore_label=cfg.MODEL.SEM_SEG_HEAD.IGNORE_VALUE,
                 output_dir=output_folder,
             )
         )
     if evaluator_type in ["coco", "coco_panoptic_seg"]:
-        evaluator_list.append(COCOEvaluator(dataset_name, output_dir=output_folder))
+        evaluator_list.append(COCOEvaluator(dataset_name, cfg, True, output_folder))
     if evaluator_type == "coco_panoptic_seg":
         evaluator_list.append(COCOPanopticEvaluator(dataset_name, output_folder))
-    if evaluator_type == "cityscapes_instance":
-        return CityscapesInstanceEvaluator(dataset_name)
-    if evaluator_type == "cityscapes_sem_seg":
-        return CityscapesSemSegEvaluator(dataset_name)
-    elif evaluator_type == "pascal_voc":
+    if evaluator_type == "pascal_voc":
         return PascalVOCDetectionEvaluator(dataset_name)
-    elif evaluator_type == "lvis":
-        return LVISEvaluator(dataset_name, output_dir=output_folder)
+    if evaluator_type == "lvis":
+        return LVISEvaluator(dataset_name, cfg, True, output_folder)
+    if evaluator_type == "text":
+        return TextEvaluator(dataset_name, cfg, True, output_folder)
     if len(evaluator_list) == 0:
         raise NotImplementedError(
             "no Evaluator for the dataset {} with the type {}".format(
                 dataset_name, evaluator_type
             )
         )
-    elif len(evaluator_list) == 1:
+    if len(evaluator_list) == 1:
         return evaluator_list[0]
     return DatasetEvaluators(evaluator_list)
 
@@ -132,14 +130,51 @@ class Detectron2DataSetAdapter(LightningDataModule):
             )
             return dataset
 
+        cfg = self.dataset_cfg[split]
         if split == "train":
-            dataset = _get_dataset(_train_loader_from_config(self.dataset_cfg[split]))
+            dataset_dicts = get_detection_dataset_dicts(
+                cfg.DATASETS.TRAIN,
+                filter_empty=cfg.DATALOADER.FILTER_EMPTY_ANNOTATIONS,
+                min_keypoints=cfg.MODEL.ROI_KEYPOINT_HEAD.MIN_KEYPOINTS_PER_IMAGE
+                if cfg.MODEL.KEYPOINT_ON
+                else 0,
+                proposal_files=cfg.DATASETS.PROPOSAL_FILES_TRAIN
+                if cfg.MODEL.LOAD_PROPOSALS
+                else None,
+            )
+
+            if cfg.MODEL.FCPOSE_ON:
+                mapper = FCPoseDatasetMapper(cfg, True)
+            else:
+                mapper = DatasetMapperWithBasis(cfg, True)
+            dataset = _get_dataset(
+                {
+                    "dataset": dataset_dicts,
+                    "mapper": mapper,
+                    "aspect_ratio_grouping": cfg.DATALOADER.ASPECT_RATIO_GROUPING,
+                }
+            )
         else:
             dataset = []
-            for dataset_name in self.dataset_cfg[split].DATASETS.TEST:
+            for dataset_name in cfg.DATASETS.TEST:
+                dataset_dicts = get_detection_dataset_dicts(
+                    [dataset_name],
+                    filter_empty=False,
+                    proposal_files=[
+                        cfg.DATASETS.PROPOSAL_FILES_TEST[
+                            list(cfg.DATASETS.TEST).index(dataset_name)
+                        ]
+                    ]
+                    if cfg.MODEL.LOAD_PROPOSALS
+                    else None,
+                )
                 dataset.append(
                     _get_dataset(
-                        _test_loader_from_config(self.dataset_cfg[split], dataset_name)
+                        {
+                            "dataset": dataset_dicts,
+                            "mapper": DatasetMapper(cfg, False),
+                            "aspect_ratio_grouping": False,
+                        }
                     )
                 )
         self.datasets[split] = dataset

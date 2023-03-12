@@ -13,12 +13,12 @@ trainer:
         - class_path: lightning.pytorch.callbacks.RichModelSummary
           init_args:
               max_depth: 2
-        - class_path: utils.callbacks.set_precision_and_cudnn_callback.SetPrecisionAndCudnnCallback
-          init_args:
-              float32_matmul_precision: high
-              allow_fp16_reduced_precision_reduction: true
-              deterministic_debug_mode: default
-              cudnn_enabled: true
+        # - class_path: utils.callbacks.set_precision_and_cudnn_callback.SetPrecisionAndCudnnCallback
+        #   init_args:
+        #       float32_matmul_precision: high
+        #       allow_fp16_reduced_precision_reduction: true
+        #       deterministic_debug_mode: default
+        #       cudnn_enabled: true
         - class_path: utils.callbacks.set_wandb_logger_callback.SetWandbLoggerCallback
           init_args:
               watch_model_cfg:

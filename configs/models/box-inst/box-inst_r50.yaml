@@ -1,0 +1,37 @@
+__import__: &model_cfg
+    MODEL:
+        META_ARCHITECTURE: "CondInst"
+        MASK_ON: True
+        WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
+        BACKBONE:
+            NAME: "build_fcos_resnet_fpn_backbone"
+        RESNETS:
+            DEPTH: 50
+            OUT_FEATURES: ["res3", "res4", "res5"]
+        FPN:
+            IN_FEATURES: ["res3", "res4", "res5"]
+        PROPOSAL_GENERATOR:
+            NAME: "FCOS"
+        FCOS:
+            THRESH_WITH_CTR: True
+            USE_SCALE: True
+        CONDINST:
+            TOPK_PROPOSALS_PER_IM: 64
+            MASK_BRANCH:
+                OUT_CHANNELS: 16
+        BOXINST:
+            ENABLED: True
+            BOTTOM_PIXELS_REMOVED: 10
+            PAIRWISE:
+                SIZE: 3
+                DILATION: 2
+                COLOR_THRESH: 0.3
+
+model:
+    class_path: models.detectron2_model_adapter.Detectron2ModelAdapter
+    init_args:
+        cfg: *model_cfg
+
+data:
+    init_args:
+        dataset_cfg: *model_cfg

@@ -1,6 +1,7 @@
 from typing import List
 
-from detectron2.config import CfgNode, get_cfg
+from adet.config import get_cfg
+from detectron2.config import CfgNode
 from detectron2.modeling import META_ARCH_REGISTRY
 from detectron2.utils.events import EventStorage
 
