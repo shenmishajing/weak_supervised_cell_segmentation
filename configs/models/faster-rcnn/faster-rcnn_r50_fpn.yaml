@@ -1,0 +1,15 @@
+model:
+    class_path: models.detectron2_model_adapter.Detectron2ModelAdapter
+    init_args:
+        cfg:
+            MODEL:
+                META_ARCHITECTURE: "GeneralizedRCNN"
+                WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
+                MASK_ON: False
+                RESNETS:
+                    DEPTH: 50
+                RPN:
+                    PRE_NMS_TOPK_TEST: 6000
+                    POST_NMS_TOPK_TEST: 1000
+                ROI_HEADS:
+                    NAME: "Res5ROIHeads"
