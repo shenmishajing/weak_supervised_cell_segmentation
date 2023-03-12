@@ -29,7 +29,7 @@ class Detectron2ModelAdapter(LightningModule):
         )
         return outputs
 
-    def forward_epoch_end(self, outputs, split="val"):
+    def forward_epoch_end(self, outputs, *args, split="val", **kwargs):
         results = self.trainer.datamodule.process_dataset_evaluation_results(split)
         self.log_dict(self.flatten_dict(results, split), sync_dist=True)
         return results
