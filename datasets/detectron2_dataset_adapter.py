@@ -29,13 +29,15 @@ from torch.utils.data import BatchSampler, DataLoader
 from datasets.base import LightningDataModule
 
 
-def build_evaluator(dataset_name, output_folder=None):
+def build_evaluator(cfg, dataset_name, output_folder=None):
     """
     Create evaluator(s) for a given dataset.
     This uses the special metadata "evaluator_type" associated with each builtin dataset.
     For your own dataset, you can simply create an evaluator manually in your
     script and do not have to worry about the hacky if-else logic here.
     """
+    if output_folder is None:
+        output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
     evaluator_list = []
     evaluator_type = MetadataCatalog.get(dataset_name).evaluator_type
     if evaluator_type in ["sem_seg", "coco_panoptic_seg"]:
@@ -186,6 +188,10 @@ class Detectron2DataSetAdapter(LightningDataModule):
         for split in self.split_names:
             self.evaluators[split] = []
             for dataset_name in self.dataset_cfg[split].DATASETS.TEST:
-                evaluator = build_evaluator(dataset_name)
+                evaluator = build_evaluator(
+                    self.dataset_cfg[split],
+                    dataset_name,
+                    os.path.join(self.trainer.log_dir, "inference"),
+                )
                 evaluator.reset()
                 self.evaluators[split].append(evaluator)
