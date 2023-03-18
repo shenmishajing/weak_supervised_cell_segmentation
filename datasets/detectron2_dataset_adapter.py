@@ -1,10 +1,7 @@
+import copy
 import os
 from collections import OrderedDict
 from typing import Sequence
-
-os.environ["DETECTRON2_DATASETS"] = "data"
-
-import copy
 
 from adet.config import get_cfg
 from adet.data.dataset_mapper import DatasetMapperWithBasis
@@ -12,16 +9,13 @@ from adet.data.fcpose_dataset_mapper import FCPoseDatasetMapper
 from adet.evaluation import TextEvaluator
 from detectron2.config import CfgNode
 from detectron2.data import DatasetMapper, MetadataCatalog
-from detectron2.data.build import get_detection_dataset_dicts, trivial_batch_collator
+from detectron2.data.build import (get_detection_dataset_dicts,
+                                   trivial_batch_collator)
 from detectron2.data.common import DatasetFromList, MapDataset
-from detectron2.evaluation import (
-    COCOEvaluator,
-    COCOPanopticEvaluator,
-    DatasetEvaluators,
-    LVISEvaluator,
-    PascalVOCDetectionEvaluator,
-    SemSegEvaluator,
-)
+from detectron2.evaluation import (COCOEvaluator, COCOPanopticEvaluator,
+                                   DatasetEvaluators, LVISEvaluator,
+                                   PascalVOCDetectionEvaluator,
+                                   SemSegEvaluator)
 from torch.utils.data import BatchSampler, DataLoader
 
 from datasets.base import LightningDataModule

@@ -1,0 +1,29 @@
+data:
+    class_path: datasets.detectron2_dataset_adapter.Detectron2DataSetAdapter
+    init_args:
+        dataset_cfg:
+            DATASETS:
+                TRAIN:
+                    - coco_2017_train
+                TEST:
+                    - coco_2017_val
+            INPUT:
+                MIN_SIZE_TRAIN: [640, 672, 704, 736, 768, 800]
+        dataloader_cfg:
+            train:
+                batch_size: 2
+                num_workers: 8
+                prefetch_factor: 2
+                pin_memory: true
+                persistent_workers: true
+            val:
+                batch_size: 1
+
+trainer:
+    callbacks:
+        change_item:
+            - - -1
+              - init_args:
+                    monitor: val/bbox/AP50
+                    filename: "epoch:{epoch}-val_map_50:{val/bbox/AP50:.4g}"
+                    mode: max
